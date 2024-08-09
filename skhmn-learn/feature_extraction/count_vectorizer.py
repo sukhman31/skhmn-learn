@@ -9,12 +9,12 @@ class CountVectorizer:
     
     def fit(self, content: list[str]):
         self.countOfWords = {}
-        dictionary = set()
+        self.dictionary = []
         for line in content:
             for word in line.split(" "):
                 self.countOfWords[word] = 1 + self.countOfWords.get(word,0)
-                dictionary.add(word)
-        self.dictionary = list(dictionary)   
+                if word not in self.dictionary:
+                    self.dictionary.append(word)
         self.fitMatrix = [[0 for word in self.dictionary] for line in content]
         for i, line in enumerate(content):
             for word in line.split(" "):
@@ -24,7 +24,8 @@ class CountVectorizer:
         fitMatrix = [[0 for word in self.dictionary] for line in content]
         for i, line in enumerate(content):
             for word in line.split(" "):
-                fitMatrix[i][self.dictionary.index(word)] += 1
+                if word in self.dictionary:
+                    fitMatrix[i][self.dictionary.index(word)] += 1
         return fitMatrix
     
     def fit_transform(self, content: list[str]) -> list[list[int]]:
