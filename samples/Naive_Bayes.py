@@ -15,6 +15,7 @@ vec.fit(corpus)
 print(vec.countOfWords)
 print(vec.dictionary)
 print(vec.fitMatrix)
+print(vec.documentOccurence)
 
 data = vec.fitMatrix
 label = [1,1,1,0]
