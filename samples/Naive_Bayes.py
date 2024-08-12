@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.dont_write_bytecode=True
 
 from skhmn_learn.feature_extraction import count_vectorizer
 from skhmn_learn.naive_bayes import nb

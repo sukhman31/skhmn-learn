@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.dont_write_bytecode=True
 
 from skhmn_learn.feature_extraction import tf_idf
 
@@ -10,6 +11,5 @@ corpus = ["Air quality in the sunny island improved gradually throughout Wednesd
 
 ti.fit(corpus)
 
-print(ti.fitMatrix)
-print(ti.idf)
-print(ti.print())
+# print(ti.fitMatrix)
+print(ti.transform(["Air on Wednesday in Singapore is monitored"]))
