@@ -30,6 +30,7 @@ class CountVectorizer:
         fitMatrix = np.zeros((len(content), len(self.dictionary)))
         for i, line in enumerate(content):
             for word in line.split(" "):
+                word = word.lower()
                 if word in self.dictionary:
                     fitMatrix[i][self.dictionary.index(word)] += 1
         return fitMatrix
