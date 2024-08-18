@@ -6,10 +6,30 @@ class Impurity(Enum):
     GINI = 1
     ENTROPY = 2
 
+class Node:
+
+    def __init__(self):
+        self.is_leaf_node = False
+        self.left_child = None
+        self.right_child = None
+
 class DecisionTrees:
     
     def __init__(self):
         None
+
+    def train_tree(self, training_data: np.ndarray, training_class: np.ndarray):
+        parent = self.recursive_build_tree(training_data, training_class, Node())
+    
+    def recurive_build_tree(self, training_data: np.ndarray, training_class: np.ndarray, root: Node):
+        best_split = self.get_best_split()
+    
+    def get_best_split(self, training_data: np.ndarray, training_class: np.ndarray):
+        for index in range(training_data.shape[0]):
+            split = self.get_split(training_data, training_class, index)
+    
+    def get_split(self, training_data: np.ndarray, training_class: np.ndarray, index: int):
+        
 
     def gini_impurity(self, labels: np.ndarray):
         impurity = 1.0
