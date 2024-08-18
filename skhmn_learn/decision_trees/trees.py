@@ -14,13 +14,19 @@ class Node:
         self.right_child = None
         self.training_data = None
         self.trainig_class = None
+        self.index = None
+        self.value = None
+        self.classification = None
 
-    def __init__(self, is_leaf_node, left_child, right_child, training_data, training_class):
+    def __init__(self, is_leaf_node, left_child, right_child, training_data, training_class, index, value, classification):
         self.is_leaf_node = is_leaf_node
         self.left_child = left_child
         self.right_child = right_child
         self.training_data = training_data
         self.trainig_class = training_class
+        self.index = index
+        self.value = value
+        self.classification = classification
 
 class DecisionTrees:
     
@@ -30,11 +36,28 @@ class DecisionTrees:
     def train_tree(self, training_data: np.ndarray, training_class: np.ndarray):
         self.parent = self.recurive_build_tree(training_data, training_class)
     
+    def classify(self, eval_data: np.ndarray):
+        return self.recursive_walk(eval_data, self.parent)
+    
+    def recursive_walk(self, eval_data: np.ndarray, root: Node):
+        if root.is_leaf_node:
+            return root.classification
+        if eval_data[root.index].dtype.kind in ['i', 'f']:
+            if eval_data[root.index] >= root.value:
+                return self.recursive_walk(eval_data, root.right_child)
+            else:
+                return self.recursive_walk(eval_data, root.left_child)
+        else:
+            if eval_data[root.index] == root.value:
+                return self.recursive_walk(eval_data, root.right_child)
+            else:
+                return self.recursive_walk(eval_data, root.left_child)
+    
     def recurive_build_tree(self, training_data: np.ndarray, training_class: np.ndarray):
         if len(np.unique(training_class)) == 1:
-            return Node(True, None, None, training_data, training_class)
-        left_split, right_split = self.get_best_split(training_data, training_class)
-        return Node(False, self.recurive_build_tree(left_split[0], left_split[1]), self.recurive_build_tree(right_split[0], right_split[1]), training_data, training_class)
+            return Node(True, None, None, training_data, training_class, None, None, np.unique(training_class)[0])
+        left_split, right_split, index, value = self.get_best_split(training_data, training_class)
+        return Node(False, self.recurive_build_tree(left_split[0], left_split[1]), self.recurive_build_tree(right_split[0], right_split[1]), training_data, training_class, index, value, None)
     
     def get_best_split(self, training_data: np.ndarray, training_class: np.ndarray):
         min_impurity = float('inf')
@@ -43,7 +66,7 @@ class DecisionTrees:
         for index in range(training_data.shape[1]):
             unique_entries = np.sort(np.unique(training_data[:, index]))
             for entry in unique_entries:
-                left_split, right_split = self.get_split(training_data, training_class, index, entry)
+                left_split, right_split, _, _ = self.get_split(training_data, training_class, index, entry)
                 imp = self.weighted_impurity([left_split[1], right_split[1]], Impurity.GINI)
                 if imp < min_impurity:
                     min_impurity = imp
@@ -57,7 +80,7 @@ class DecisionTrees:
             mask = data_index >= entry
         else:
             mask = data_index == entry
-        return [training_data[~mask, :], training_class[~mask]], [training_data[mask, :], training_class[mask]]
+        return [training_data[~mask, :], training_class[~mask]], [training_data[mask, :], training_class[mask]], index, entry
 
 
     def gini_impurity(self, labels: np.ndarray):
