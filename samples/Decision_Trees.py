@@ -5,7 +5,6 @@ sys.dont_write_bytecode=True
 
 import numpy as np
 from skhmn_learn.decision_trees.trees import DecisionTrees
-from skhmn_learn.decision_trees.trees import Impurity
 
 dt = DecisionTrees()
 
@@ -19,14 +18,14 @@ dt = DecisionTrees()
 
 # print(dt.weighted_impurity([[1, 0, 1], [0, 1]], Impurity.ENTROPY))
 
-X_train = np.array([['tech', 'professional'],
-['fashion', 'student'],
-['fashion', 'professional'],
-['sports', 'student'],
-['tech', 'student'],
-['tech', 'retired'],
-['sports', 'professional']])
-y_train = np.array([1, 0, 0, 0, 1, 0, 1])
+X_train = np.array([['tech', 'professional', 24],
+['fashion', 'student', 20],
+['fashion', 'professional', 25],
+['sports', 'student', 18],
+['tech', 'student', 18],
+['tech', 'retired', 57],
+['sports', 'professional', 36]])
+y_train = np.array([1, 1, 0, 0, 1, 0, 1])
 
 dt.train_tree(X_train, y_train)
 
@@ -40,4 +39,4 @@ dt.train_tree(X_train, y_train)
 # print(dt.parent.right_child.left_child)
 # print(dt.parent.right_child.right_child)
 
-print(dt.classify(np.array(['fashion', 'retired'])))
+print(dt.classify(np.array(['tech', 'professional', 27])))
