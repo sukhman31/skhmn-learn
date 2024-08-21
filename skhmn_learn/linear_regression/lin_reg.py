@@ -20,4 +20,4 @@ class LinearRegression:
         sum = 0.0
         for exp, calc in zip(classification, calculated_class):
             sum += (exp-calc)**2
-        return (sum/len(classification))[0]
+        return (sum/len(classification))[0] 

@@ -36,8 +36,28 @@ class DecisionTrees:
     def train_tree(self, training_data: np.ndarray, training_class: np.ndarray):
         self.parent = self.recurive_build_tree(training_data, training_class)
     
+    def train_regression_tree(self, training_data: np.ndarray, training_val: np.ndarray):
+        self.parent = self.recursive_build_regression_tree(training_data, training_val)
+    
     def classify(self, eval_data: np.ndarray):
         return self.recursive_walk(eval_data, self.parent)
+    
+    def evaluate(self, eval_data: np.ndarray):
+        return self.recursive_regression_walk(eval_data, self.parent)
+    
+    def recursive_regression_walk(self, eval_data: np.ndarray, root: Node):
+        if root.is_leaf_node:
+            return np.average(root.trainig_class)
+        if eval_data[root.index].dtype.kind in ['i', 'f']:
+            if eval_data[root.index] >= root.value:
+                return self.recursive_walk(eval_data, root.right_child)
+            else:
+                return self.recursive_walk(eval_data, root.left_child)
+        else:
+            if eval_data[root.index] == root.value:
+                return self.recursive_walk(eval_data, root.right_child)
+            else:
+                return self.recursive_walk(eval_data, root.left_child)
     
     def recursive_walk(self, eval_data: np.ndarray, root: Node):
         if root.is_leaf_node:
@@ -59,6 +79,12 @@ class DecisionTrees:
         left_split, right_split, index, value = self.get_best_split(training_data, training_class)
         return Node(False, self.recurive_build_tree(left_split[0], left_split[1]), self.recurive_build_tree(right_split[0], right_split[1]), training_data, training_class, index, value, None)
     
+    def recursive_build_regression_tree(self, training_data: np.ndarray, training_val: np.ndarray):
+        if len(training_val) == 2:
+            return Node(True, None, None, training_data, training_val, None, None, None)
+        left_split, right_split, index, value = self.get_best_split(training_data, training_val)
+        return Node(False, self.recurive_build_tree(left_split[0], left_split[1]), self.recurive_build_tree(right_split[0], right_split[1]), training_data, training_val, index, value, None)
+    
     def get_best_split(self, training_data: np.ndarray, training_class: np.ndarray):
         min_impurity = float('inf')
         best_index = None
@@ -73,6 +99,21 @@ class DecisionTrees:
                     best_index = index
                     best_entry = entry
         return self.get_split(training_data, training_class, best_index, best_entry)
+    
+    def get_best_regression_split(self, training_data: np.ndarray, training_val: np.ndarray):
+        min_variance = float('inf')
+        best_index = None
+        best_entry = None
+        for index in range(training_data.shape[1]):
+            unique_entries = np.sort(np.unique(training_data[:, index]))
+            for entry in unique_entries:
+                left_split, right_split, _, _ = self.get_split(training_data, training_val, index, entry)
+                var = self.weighted_variance([left_split[1], right_split[1]])
+                if var < min_variance:
+                    min_variance = var
+                    best_index = index
+                    best_entry = entry
+        return self.get_split(training_data, training_val, best_index, best_entry)
     
     def get_split(self, training_data: np.ndarray, training_class: np.ndarray, index: int, entry):
         data_index = training_data[:, index]
@@ -112,3 +153,13 @@ class DecisionTrees:
             for group in groups:
                 wi += len(group)*self.entropy(group)/total
         return wi
+    
+    def variance(self, labels: np.ndarray):
+        return np.var(labels)
+    
+    def weighted_variance(self, groups: list[list[int]]):
+        wv = 0.0
+        total = sum(len(group) for group in groups)
+        for group in groups:
+            wv += len(group)*self.variance(group)/total
+        return wv

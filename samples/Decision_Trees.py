@@ -40,3 +40,17 @@ dt.train_tree(X_train, y_train)
 # print(dt.parent.right_child.right_child)
 
 print(dt.classify(np.array(['tech', 'professional', 27])))
+
+# print(dt.weighted_variance([[1,2,3],[1,2]]))
+
+X_train_reg = np.array([['tech', 'professional', 24],
+['fashion', 'student', 20],
+['fashion', 'professional', 25],
+['sports', 'student', 18],
+['tech', 'student', 18],
+['tech', 'retired', 57],
+['sports', 'professional', 36]])
+y_train_reg = np.array([15.6, 14.7, 17.8, 19.3, 14.67, 13.4, 16.8])
+
+dt.train_regression_tree(X_train_reg, y_train_reg)
+print(dt.evaluate(np.array(['tech', 'student', 57])))
